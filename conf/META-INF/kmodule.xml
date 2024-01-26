@@ -1,0 +1,7 @@
+<kmodule xmlns="http://www.drools.org/xsd/kmodule">
+
+    <kbase name="kbase" packages="drools">
+        <ksession name="leucemiaKS"/>
+    </kbase>
+
+</kmodule>

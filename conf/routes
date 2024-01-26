@@ -1,0 +1,16 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# APIs in EmployeeController
+#POST    /patient                  controllers.PatientController.create()
+POST    /patients                 controllers.PatientController.createFromJSON(request:Request)
+PUT     /patients/:id             controllers.PatientController.update(id:Int,request:Request)
+DELETE  /patients/:id             controllers.PatientController.delete(id:Int)
+
+GET     /patients                 controllers.PatientController.listPatients()
+GET     /patients/:id             controllers.PatientController.retrieve(id:Int)
+GET     /patients/:id/diagnosis   controllers.PatientController.generalDiagnosis(id:Int)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

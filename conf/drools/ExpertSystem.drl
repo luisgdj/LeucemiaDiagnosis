@@ -1,0 +1,344 @@
+package drools;
+
+import entities.*;
+import java.util.List;
+
+//REGLAS ETIOLÓGICAS DEL PACIENTE:
+rule "Regla: Riesgo etiológico para LMC"
+    when
+        $patient: Patient($id: id)
+        $d: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+    then
+        $d.setRiskFactorIndex(0);
+        if($patient.getAge()<10 || ($patient.getAge()>=18 && $patient.getAge()<60)){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isGenFiladelfia()){
+            $d.incrementRiskFactorIndex(5);
+        }
+        if($patient.isRadOQuimicos()){
+            $d.incrementRiskFactorIndex(1);
+        }
+        if($patient.isTransplanteMO()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isFarmacosQuimio()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isAntecedentesFamiliares()){
+            $d.incrementRiskFactorIndex(1);
+        }
+end
+
+rule "Regla: Riesgo etiológico para LMA"
+    when
+        $patient: Patient($id: id)
+        $d: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+    then
+        $d.setRiskFactorIndex(0);
+        if($patient.getAge()>=10 && $patient.getAge()<18){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.getSex().equals(Sex.MALE)){
+            $d.incrementRiskFactorIndex(3);
+        }
+        if($patient.isTrastornosSang()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isRadOQuimicos()){
+            $d.incrementRiskFactorIndex(1);
+        }
+        if($patient.isTransplanteMO()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isFarmacosQuimio()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isAntecedentesFamiliares()){
+            $d.incrementRiskFactorIndex(1);
+        }
+end
+
+rule "Regla: Riesgo etiológico para LLC"
+    when
+        $patient: Patient($id: id)
+        $d: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+    then
+        $d.setRiskFactorIndex(0);
+        if($patient.getAge()>=60){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.getSex().equals(Sex.MALE)){
+            $d.incrementRiskFactorIndex(3);
+        }
+        if($patient.isRazaBlanca()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isTransplanteMO()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isFarmacosQuimio()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isAntecedentesFamiliares()){
+            $d.incrementRiskFactorIndex(1);
+        }
+end
+
+rule "Regla: Riesgo etiológico para LLA"
+    when
+        $patient: Patient($id: id)
+        $d: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        $d.setRiskFactorIndex(0);
+        if($patient.getAge()<18){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isTrastornosGeneticos()){
+            $d.incrementRiskFactorIndex(3);
+        }
+        if($patient.isHermanosLeucemia()){
+            $d.incrementRiskFactorIndex(3);
+        }
+        if($patient.isTransplanteMO()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isFarmacosQuimio()){
+            $d.incrementRiskFactorIndex(2);
+        }
+        if($patient.isAntecedentesFamiliares()){
+            $d.incrementRiskFactorIndex(1);
+        }
+end
+
+
+//REGLAS SINTOMÁTICAS DEL PACIENTE:
+rule "Probando síntoma fiebre"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Fiebre", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma fatiga"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Fatiga", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma debilidad"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Debilidad", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma palidez"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Palidez", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma dificultad para respirar"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Dificultad respiratoria", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma infecciones recurrentes"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Infecciones recurrentes", treated == false)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma tendencia a hematomas"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Propenso a hematomas", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma pequeñas manchas en la piel (petequias)"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Petequias", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma sudoracion excesiva nocturna"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Sudores nocturnos", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma sudoracion fria excesiva"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Sudores fríos", treated == false)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma dolor de huesos y articulaciones"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Dolor articulaciones/huesos", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma presion bajo las costillas izquierdas inferiores"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Hepatoesplenomegalia", treated == false)
+        $dLMC: Diagnosis(patientId == $id, type == LeucemiaType.MC)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMC.incrementSymptomIndex($symptom.getScore());
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma inflamación de ganglios linfáticos"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Inflamación de ganglios linfáticos", treated == false)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma saciedad temprana o falta de apetito"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Saciedad temprana", treated == false)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma perdida de peso"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Pérdida de peso", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLC: Diagnosis(patientId == $id, type == LeucemiaType.LC)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLC.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma periodos mensatruales abundantes"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Menstruación abundante", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma hemorragia nasal"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Hemorragia nasal", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+        $dLLA: Diagnosis(patientId == $id, type == LeucemiaType.LA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+        $dLLA.incrementSymptomIndex($symptom.getScore());
+end
+
+rule "Probando síntoma hemorragia/inflamación de las encías"
+    when
+        $patient: Patient($id: id)
+        $symptom: Symptom(patientId == $id, name == "Hemorragia/inflamación de encías", treated == false)
+        $dLMA: Diagnosis(patientId == $id, type == LeucemiaType.MA)
+    then
+        modify($symptom) {setTreated(true)};
+        $dLMA.incrementSymptomIndex($symptom.getScore());
+end
+
+
+rule "nombre de regla"
+    when
+        //condiciones
+    then
+        //acciones
+end
