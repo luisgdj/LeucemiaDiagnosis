@@ -7,7 +7,6 @@
 POST    /patients                 controllers.PatientController.createFromJSON(request:Request)
 PUT     /patients/:id             controllers.PatientController.update(id:Int,request:Request)
 DELETE  /patients/:id             controllers.PatientController.delete(id:Int)
-
 GET     /patients                 controllers.PatientController.listPatients()
 GET     /patients/:id             controllers.PatientController.retrieve(id:Int)
 GET     /patients/:id/diagnosis   controllers.PatientController.generalDiagnosis(id:Int)
